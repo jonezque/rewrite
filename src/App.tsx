@@ -1,26 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { CircularProgress } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import React, { lazy, Suspense, useState } from 'react';
+import { HashRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import Header from './Header';
+import SidebarMenu from './SidebarMenu';
 
-export default App;
+const GroupPage = lazy(() => import('./groups'));
+const SubjectPage = lazy(() => import('./subjects'));
+
+export default () => {
+    const [show, setShow] = useState(true);
+    return (
+        <Router>
+            <Header setShow={setShow} />
+            <main>
+                <Box mt={8} display="flex">
+                    <Box pl={1} pr={2}>
+                        <SidebarMenu show={show} />
+                    </Box>
+                    <Box flex={1} mt={2} mr={1}>
+                        <Switch>
+                            <Route path="/groups">
+                                <Suspense fallback={<CircularProgress size={200} />}>
+                                    <GroupPage />
+                                </Suspense>
+                            </Route>
+                            <Route path="/subjects">
+                                <Suspense fallback={<CircularProgress size={200} />}>
+                                    <SubjectPage />
+                                </Suspense>
+                            </Route>
+                            <Route exact path="/">
+                                <Redirect to="/groups" />
+                            </Route>
+                            <Route path="*">
+                                <div> 404 Not Found</div>
+                            </Route>
+                        </Switch>
+                    </Box>
+                </Box>
+            </main>
+        </Router>
+    );
+};
